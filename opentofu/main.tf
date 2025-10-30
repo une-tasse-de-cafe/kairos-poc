@@ -62,9 +62,9 @@ resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
     stages:
         initramfs:
             - name: "Setup hostname"
-            hostname: "node-{{ trunc 4 .MachineID }}"
+              hostname: "node-{{ trunc 4 .MachineID }}"
     users:
-    - name: "kairos"
+      - name: "kairos"
         groups: [ "admin", "wheel" ]
         ssh_authorized_keys:
         - github:qjoly
@@ -78,10 +78,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
     install:
         device: "/dev/sda"
         reboot: true
-        poweroff: true
         auto: true
-        bundles:
-            -  quay.io/kairos/packages:k9s-utils-0.26.7
     kubevip:
         enabled: true
         eip: 192.168.1.10
