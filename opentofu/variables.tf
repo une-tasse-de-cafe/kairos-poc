@@ -10,6 +10,12 @@ variable "vm_name_prefix" {
   default     = "kairos-cp"
 }
 
+variable "node_name" {
+  description = "Proxmox node name where VMs will be created"
+  type        = string
+  default     = "homelab-proxmox-01"
+}
+
 variable "proxmox_password" {
   description = "Proxmox VE password"
   type        = string

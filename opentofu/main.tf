@@ -1,15 +1,17 @@
 resource "proxmox_virtual_environment_vm" "kairos" {
   count       = var.vm_count
   name        = "${var.vm_name_prefix}-${count.index + 1}"
-  description = "Managed by Terraform"
-  tags        = ["terraform", "ubuntu"]
+  description = "Kairos VM ${count.index + 1}"
+  tags        = ["terraform", "Kairos"]
 
-  node_name = "homelab-proxmox-01"
+  node_name = var.node_name
   agent {
     enabled = true
   }
 
   stop_on_destroy = true
+
+  boot_order = ["scsi0", "ide3"]
 
   startup {
     order      = "${3 + count.index}"
@@ -18,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "kairos" {
   }
 
   cdrom {
-    file_id    = "local:iso/kairos-rocky-9.6-standard-amd64-generic-v3.5.6-k0sv1.32.8_k0s.0.iso"
+    file_id    = "local:iso/kairos-alpine-3.21-standard-amd64-generic-v3.5.6-k3sv1.32.9_k3s1.iso"
   }
 
   cpu {
@@ -27,8 +29,8 @@ resource "proxmox_virtual_environment_vm" "kairos" {
   }
 
   memory {
-    dedicated = 2048
-    floating  = 2048 # set equal to dedicated to enable ballooning
+    dedicated = 3072
+    floating  = 2048
   }
 
   disk {
@@ -50,11 +52,10 @@ resource "proxmox_virtual_environment_vm" "kairos" {
   }
 }
 
-
 resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
   content_type = "snippets"
   datastore_id = "local"
-  node_name = "homelab-proxmox-01"
+  node_name = var.node_name
 
   source_raw {
     data = <<-EOF
