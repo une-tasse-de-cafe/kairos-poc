@@ -11,6 +11,6 @@ provider "proxmox" {
   endpoint = "https://192.168.1.181:8006/"
 
   username = "root@pam"
-  password = "${env.PROXMOX_PASSWORD}"
+  password = var.proxmox_password
   insecure = true
 }

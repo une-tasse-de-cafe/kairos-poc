@@ -9,3 +9,9 @@ variable "vm_name_prefix" {
   type        = string
   default     = "kairos-cp"
 }
+
+variable "proxmox_password" {
+  description = "Proxmox VE password"
+  type        = string
+  sensitive   = true
+}
