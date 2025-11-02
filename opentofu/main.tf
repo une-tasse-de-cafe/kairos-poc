@@ -20,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "kairos" {
   }
 
   cdrom {
-    file_id    = "local:iso/kairos-alpine-3.21-standard-amd64-generic-v3.5.6-k3sv1.32.9_k3s1.iso"
+    file_id    = "local:iso/kairos-rocky-9.6-standard-amd64-generic-v3.5.6-k3sv1.34.1_k3s1.iso"
   }
 
   cpu {
@@ -64,6 +64,7 @@ resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
         initramfs:
             - name: "Setup hostname"
               hostname: "node-{{ trunc 4 .MachineID }}"
+
     users:
       - name: "kairos"
         groups: [ "admin", "wheel" ]
@@ -75,14 +76,28 @@ resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
         args:
         - --disable=traefik,servicelb
         - --write-kubeconfig-mode 0644
-        - --node-taint 'node-role.kubernetes.io/control-plane=effect:NoSchedule'
     install:
-        device: "/dev/sda"
         reboot: true
         auto: true
+
+    auto:
+      enable: true
+    
+    p2p:
+     network_token: "${var.p2p_network_token}"
+     disable_dht: true # Disabling DHT makes co-ordination to discover nodes only in the local network
+     auto:
+        ha:
+          enable: true
+          master_nodes: 2
     kubevip:
         enabled: true
-        eip: 192.168.1.10
+        eip: ${var.kubevip_eip}
+        interface: "ens18"
+
+    bundles:
+    - targets:
+      - run://quay.io/kairos/packages:kube-vip-utils-1.0.0
     EOF
 
     file_name = "user-data-cloud-config.yaml"
